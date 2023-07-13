@@ -2,6 +2,7 @@
 -- that computes and store the average score for a student.
 -- An average score can be a decimal
 -- Create the stored procedure
+DROP PROCEDURE IF EXISTS ComputeAverageScoreForUser;
 DELIMITER $$
 CREATE PROCEDURE ComputeAverageScoreForUser(
   IN user_id INT
@@ -12,7 +13,7 @@ BEGIN
   -- Compute the average score
   SELECT AVG(score) INTO avg_score
   FROM corrections
-  WHERE user_id = user_id;
+  WHERE corrections.user_id = user_id;
 
   -- Update the user's average score
   UPDATE users
