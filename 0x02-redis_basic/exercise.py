@@ -4,6 +4,7 @@ import redis
 import uuid
 from typing import Union, Callable
 import functools
+import ast
 
 
 def count_calls(method: Callable) -> Callable:
@@ -35,6 +36,20 @@ def call_history(method: Callable) -> Callable:
         return output
 
     return wrapper
+
+
+def replay(method: Callable):
+    """ftn to display history of calls"""
+    input_key = method.__qualname__ + ":inputs"
+    output_key = method.__qualname__ + ":outputs"
+
+    inputs = [ast.literal_eval(args_str.decode())
+              for args_str in cache._redis.lrange(input_key, 0, -1)]
+    outputs = cache._redis.lrange(output_key, 0, -1)
+
+    print(f"{method.__qualname__} was called {len(inputs)} times:")
+    for args, output in zip(inputs, outputs):
+        print(f"{method.__qualname__}(*{args}) -> {output.decode()}")
 
 
 class Cache:
